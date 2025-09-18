@@ -15,11 +15,9 @@ This project implements a 6-class classification system for fMRI task states:
 | **DYN** | Dynamic Task | 4 |
 | **rest** | Resting State | 5 |
 
-## 📊 Dataset Information
+## 📊 Sample Dataset Information
 
 - **Input Dimensions**: `(214, 277, 1)` → (brain regions, time points, channels)
-- **Total Subjects**: 58 subjects
-- **Data Split**: 45 training subjects, 13 validation subjects
 - **Architecture**: Custom CNN adapted from EEGNet for fMRI data
 - **Performance**: ~84% balanced accuracy on validation set
 
@@ -37,9 +35,9 @@ conda install tensorflow-gpu
 ### 2. Required Files
 
 Ensure these files are in your project directory:
-- `dataframe.pkl` - Main fMRI dataset
-- `subjs.pickle` - Pre-defined subject splits
-- `fMRI_net32.ipynb` - Main notebook
+- `fMRINet/toy_dataframe.pkl` - Main fMRI dataset
+- `fMRINet/subjs.pickle` - Pre-defined subject splits
+- `fMRINet/fMRINet_8.ipynb` - Main notebook
 
 ### 3. Run the Analysis
 
@@ -227,7 +225,6 @@ fMRI-PROJECT/
 
 ```
 
-
 ## 📁 Project Structure 
 ```markdown
 fMRI-PROJECT/
@@ -238,11 +235,11 @@ fMRI-PROJECT/
 │       ├── spatial_filters.png   # Learned spatial filter visualization
 │       └── temporal_filters.png  # Learned temporal filter visualization
 │
-├── fMRINet/fMRINet_8.ipynb               # Main analysis notebook
+├── fMRINet/fMRINet_8.ipynb       # Main analysis notebook
 ├── README.md                     # Project description and usage instructions
-├── Requirements.txt              # Python dependencies
-├── fMRINet/subjs.pickle                  # Subject ID splits for reproducibility
-└── fMRINet/toy_dataframe.pkl             # Tiny demo dataset for quick tests (this is prefereed )
+├── requirements.txt              # Python dependencies
+├── fMRINet/subjs.pickle          # Subject ID splits for reproducibility
+└── fMRINet/toy_dataframe.pkl     # Tiny demo dataset for quick tests
 ```
 
 ## 📝 Usage Notes
