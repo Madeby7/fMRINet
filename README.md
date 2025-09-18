@@ -39,7 +39,7 @@ conda install tensorflow-gpu
 Ensure these files are in your project directory:
 - `dataframe.pkl` - Main fMRI dataset
 - `subjs.pickle` - Pre-defined subject splits
-- `vernon_last.ipynb` - Main notebook
+- `fMRI_net32.ipynb` - Main notebook
 
 ### 3. Run the Analysis
 
@@ -252,3 +252,8 @@ fMRI-PROJECT/
 3. **Learning rate scheduling**: Halves LR every 200 epochs
 4. **Model checkpointing**: Automatically saves best performing model
 5. **Filter interpretation**: Visualize learned temporal and spatial patterns
+
+## Acknowledgments
+
+This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
+Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification.
