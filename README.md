@@ -220,9 +220,9 @@ The results section and Filter Visualization considered with the actual datafram
 
 ```
 fMRI-PROJECT/
-├── fMRI_net32.ipynb          # Main analysis notebook
-├── toy_dataframe.pkl          # fMRI time series dataset
-├── subjs.pickle               # Subject ID splits for reproducibility
+├── fMRINet/fMRINet_8.ipynb         # Main analysis notebook
+├── fMRINet/toy_dataframe.pkl          # fMRI time series dataset
+├── fMRINet/subjs.pickle               # Subject ID splits for reproducibility
 └── README.md                  # This file
 
 ```
@@ -231,18 +231,18 @@ fMRI-PROJECT/
 ## 📁 Project Structure 
 ```markdown
 fMRI-PROJECT/
-├── assets/                       # Project assets (figures & tables)
+├── fMRINet/assets/                       # Project assets (figures & tables)
 │   ├── images/                   # High-level tables and static diagrams
 │   │   └── model_architecture_table.jpg   # Architecture summary table as image
 │   └── plots/                    # Visualization outputs
 │       ├── spatial_filters.png   # Learned spatial filter visualization
 │       └── temporal_filters.png  # Learned temporal filter visualization
 │
-├── fMRI_net32.ipynb              # Main analysis notebook
+├── fMRINet/fMRINet_8.ipynb               # Main analysis notebook
 ├── README.md                     # Project description and usage instructions
 ├── Requirements.txt              # Python dependencies
-├── subjs.pickle                  # Subject ID splits for reproducibility
-└── toy_dataframe.pkl             # Tiny demo dataset for quick tests (this is prefereed )
+├── fMRINet/subjs.pickle                  # Subject ID splits for reproducibility
+└── fMRINet/toy_dataframe.pkl             # Tiny demo dataset for quick tests (this is prefereed )
 ```
 
 ## 📝 Usage Notes
