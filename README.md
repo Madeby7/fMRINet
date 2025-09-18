@@ -2,7 +2,7 @@
 
 A deep learning approach for classifying cognitive task states from fMRI time series data using a custom CNN architecture adapted for neuroimaging data.
 
-## 🧠 Overview
+##  Overview
 
 This project implements a 6-class classification system for fMRI task states:
 
@@ -15,7 +15,7 @@ This project implements a 6-class classification system for fMRI task states:
 | **DYN** | Dynamic Task | 4 |
 | **rest** | Resting State | 5 |
 
-## 📊 Sample Dataset Information
+##  Sample Dataset Information
 
 - **Input Dimensions**: `(214, 277, 1)` → (brain regions, time points, channels)
 - **Architecture**: Custom CNN adapted from EEGNet for fMRI data
@@ -43,7 +43,7 @@ Ensure these files are in your project directory:
 
 Execute notebook cells sequentially for complete analysis pipeline.
 
-## 📋 Step-by-Step Workflow
+##  Step-by-Step Workflow
 
 ### Step 1: Data Loading and Preprocessing
 
@@ -188,7 +188,7 @@ Flatten → Dense(6) → Softmax
 - **Trainable Parameters**: 11,366
 - **Non-trainable Parameters**: 192
 
-## 📈 Results
+##  Results
 
 - **Validation Accuracy**: ~83-84%
 - **Balanced Accuracy**: ~84%
@@ -214,7 +214,7 @@ The notebook includes visualization of learned filters:
 ## Important Note: 
 The results section and Filter Visualization considered with the actual dataframe.pkl which includes actual data; Considering overall methodology that performed with fMRI filter base CNN arhitecture we mentioned toy_dataframe that include pretty tiny amount of the data to provide to work on. 
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 fMRI-PROJECT/
@@ -225,7 +225,7 @@ fMRI-PROJECT/
 
 ```
 
-## 📁 Project Structure 
+##  Project Structure 
 ```markdown
 fMRI-PROJECT/
 ├── fMRINet/assets/                       # Project assets (figures & tables)
@@ -242,13 +242,16 @@ fMRI-PROJECT/
 └── fMRINet/toy_dataframe.pkl     # Tiny demo dataset for quick tests
 ```
 
-## 📝 Usage Notes
+##  Usage Notes
 
-1. **Subject-based splits**: Prevents data leakage between train/validation
-2. **Custom constraints**: ZeroThresholdConstraint enforces sparsity
-3. **Learning rate scheduling**: Halves LR every 200 epochs
-4. **Model checkpointing**: Automatically saves best performing model
-5. **Filter interpretation**: Visualize learned temporal and spatial patterns
+1. **Subject-based splits**: Prevents data leakage between train/validation  
+2. **No preprocessing included**: This model does not perform any preprocessing and/or artifact removal.  
+   Commonly available pipelines (e.g., fMRIPrep) can be used for artifact removal, preprocessing, and filtering.  
+3. **Custom constraints**: ZeroThresholdConstraint enforces sparsity  
+4. **Learning rate scheduling**: Halves LR every 200 epochs  
+5. **Model checkpointing**: Automatically saves best performing model  
+6. **Filter interpretation**: Visualize learned temporal and spatial patterns
+
 
 ## Acknowledgments
 
