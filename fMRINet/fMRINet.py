@@ -1,14 +1,11 @@
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Concatenate, Attention, Reshape
 from tensorflow.keras.layers import Dense, Activation, Permute, Dropout
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, AveragePooling2D
+from tensorflow.keras.layers import Conv2D, AveragePooling2D
 from tensorflow.keras.layers import SeparableConv2D, DepthwiseConv2D
 from tensorflow.keras.layers import BatchNormalization
-from tensorflow.keras.layers import SpatialDropout2D
-from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.layers import Input, Flatten
-from tensorflow.keras.constraints import max_norm, Constraint
+from tensorflow.keras.constraints import Constraint
 import tensorflow as tf
 
 
@@ -20,7 +17,6 @@ class ZeroThresholdConstraint(Constraint):
         return w
     def get_config(self):
         return {'threshold': self.threshold}
-
 
 
 def build_fmri_net(temporal_filters=8, num_classes=6,
@@ -54,12 +50,14 @@ def build_fmri_net(temporal_filters=8, num_classes=6,
     return Model(inputs=inputs, outputs=softmax, name=name)
 
 
+def fmriNet8(num_classes=6, input_shape=(214, 277, 1), **kwargs):
+    return build_fmri_net(temporal_filters=8, num_classes=num_classes,
+                          input_shape=input_shape, name="fmriNet8", **kwargs)
 
-def fmriNet8(num_classes=6, **kwargs):
-    return build_fmri_net(temporal_filters=8, num_classes=num_classes, name="fmriNet8", **kwargs)
+def fmriNet16(num_classes=6, input_shape=(214, 277, 1), **kwargs):
+    return build_fmri_net(temporal_filters=16, num_classes=num_classes,
+                          input_shape=input_shape, name="fmriNet16", **kwargs)
 
-def fmriNet16(num_classes=6, **kwargs):
-    return build_fmri_net(temporal_filters=16, num_classes=num_classes, name="fmriNet16", **kwargs)
-
-def fmriNet32(num_classes=6, **kwargs):
-    return build_fmri_net(temporal_filters=32, num_classes=num_classes, name="fmriNet32", **kwargs)
+def fmriNet32(num_classes=6, input_shape=(214, 277, 1), **kwargs):
+    return build_fmri_net(temporal_filters=32, num_classes=num_classes,
+                          input_shape=input_shape, name="fmriNet32", **kwargs)
