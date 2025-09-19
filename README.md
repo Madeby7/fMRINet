@@ -1,8 +1,8 @@
 # fMRI Task State Classification with Deep Learning
 
-A deep learning approach for classifying cognitive task states from fMRI time series data using a custom CNN architecture adapted for neuroimaging data.
+A deep learning approach for classifying cognitive task states from fMRI time series data using a custom CNN architecture adapted from EEGNet for neuroimaging data.
 
-##  Overview
+## Overview
 
 This project implements a 6-class classification system for fMRI task states:
 
@@ -35,15 +35,17 @@ conda install tensorflow-gpu
 ### 2. Required Files
 
 Ensure these files are in your project directory:
-- `fMRINet/toy_dataframe.pkl` - Main fMRI dataset
+- `fMRINet/toy_dataframe.pkl` - Demo fMRI dataset (for testing)
+- `fMRINet/dataframe.pkl` - Full fMRI dataset (contact author for access)
 - `fMRINet/subjs.pickle` - Pre-defined subject splits
 - `fMRINet/fMRINet_8.ipynb` - Main notebook
+- `fMRINet/fMRINet.py` - Model architecture definitions
 
 ### 3. Run the Analysis
 
 Execute notebook cells sequentially for complete analysis pipeline.
 
-##  Step-by-Step Workflow
+## 📋 Step-by-Step Workflow
 
 ### Step 1: Data Loading and Preprocessing
 
@@ -79,35 +81,17 @@ weights = sklearn.utils.class_weight.compute_class_weight(
 )
 ```
 
-### Step 4: Model Architecture
+### Step 4: Model Architecture Selection
 
 ```python
-# Custom CNN with temporal-spatial processing
-inputs  = Input(shape = (214, 277, 1))
-x       = Dropout(0.25)(inputs)
-x       = Conv2D(8, (1, 60), padding = 'same', use_bias = False)(x)
-x       = Permute((2, 1, 3))(x)
-x       = DepthwiseConv2D((1, 214), use_bias = False,
-                               depth_multiplier = 4,
-                               depthwise_constraint = ZeroThresholdConstraint(threshold=0.01))(x)
-x       = BatchNormalization()(x)
-x       = Activation('relu')(x)
-x       = Permute((2, 1, 3))(x)
-x       = AveragePooling2D((1, 15))(x)
-x       = Dropout(0.5)(x)
+# Choose from three available architectures
+from fMRINet import fmriNet8, fmriNet16, fmriNet32
 
-x       = SeparableConv2D(64, (1, 8), padding = 'same',
-                               use_bias = False)(x)
-x       = BatchNormalization()(x)
-x       = Activation('relu')(x)
-x       = AveragePooling2D((1, 4))(x)
-x       = Dropout(0.5)(x)
+model = fmriNet8(num_classes=6)   # 8 temporal filters
+# model = fmriNet16(num_classes=6)  # 16 temporal filters  
+# model = fmriNet32(num_classes=6) # 32 temporal filters
 
-features      = Flatten(name = 'flatten')(x)
-
-dense         = Dense(6)(features)
-softmax       = Activation('softmax', name = 'softmax')(dense)
-
+model.summary()
 ```
 
 ### Step 5: Training Configuration
@@ -122,7 +106,9 @@ model.compile(
 
 # Callbacks
 checkpointer = ModelCheckpoint('/tmp/checkpoint.h5', save_best_only=True)
-lr_schedule = lambda epoch: 0.001 * np.power(0.5, np.floor(epoch/200))
+def lr_schedule(epoch):
+    return (0.001 * np.power(0.5, np.floor(epoch/200)))
+scheduler = LearningRateScheduler(lr_schedule, verbose=1)
 ```
 
 ### Step 6: Model Training
@@ -153,10 +139,10 @@ balanced_accuracy = balanced_accuracy_score(
 
 ## 🏗️ Model Architecture Details
 
-![Model Summary & Explanations](assets/images/model_architecture_table.jpg)
+![Summary & Explanations of fMRINet8](assets/images/model_architecture_table.jpg)
 
 
-
+<!--  -->
 ### Network Structure
 ```
 Input: (214, 277, 1)
@@ -214,44 +200,38 @@ The notebook includes visualization of learned filters:
 ## Important Note: 
 The results section and Filter Visualization considered with the actual dataframe.pkl which includes actual data; Considering overall methodology that performed with fMRI filter base CNN arhitecture we mentioned toy_dataframe that include pretty tiny amount of the data to provide to work on. 
 
-##  Project Structure
+## 📁 Project Structure
 
 ```
 fMRI-PROJECT/
-├── fMRINet/fMRINet_8.ipynb         # Main analysis notebook
-├── fMRINet/toy_dataframe.pkl          # fMRI time series dataset
-├── fMRINet/subjs.pickle               # Subject ID splits for reproducibility
-└── README.md                  # This file
-
-```
-
-##  Project Structure 
-```markdown
-fMRI-PROJECT/
-├── fMRINet/assets/                       # Project assets (figures & tables)
-│   ├── images/                   # High-level tables and static diagrams
-│   │   └── model_architecture_table.jpg   # Architecture summary table as image
-│   └── plots/                    # Visualization outputs
-│       ├── spatial_filters.png   # Learned spatial filter visualization
-│       └── temporal_filters.png  # Learned temporal filter visualization
+├── assets/                          # Project assets (figures & tables)
+│   ├── images/                      # High-level tables and static diagrams
+│   │   └── model_architecture_table.jpg   # Architecture summary table
+│   └── plots/                       # Visualization outputs
+│       ├── spatial_filters.png     # Learned spatial filter visualization
+│       └── temporal_filters.png    # Learned temporal filter visualization
 │
-├── fMRINet/fMRINet_8.ipynb       # Main analysis notebook
-├── README.md                     # Project description and usage instructions
-├── requirements.txt              # Python dependencies
-├── fMRINet/subjs.pickle          # Subject ID splits for reproducibility
-└── fMRINet/toy_dataframe.pkl     # Tiny demo dataset for quick tests
+├── fMRINet/                         # Main project directory
+│   ├── fMRINet_8.ipynb             # Main analysis notebook
+│   ├── fMRINet.py                # Model architecture definitions
+│   ├── toy_dataframe.pkl           # Demo dataset (for testing) - [Actual data provided on the side of authors.]
+│   └── subjs.pickle                # Subject ID splits for reproducibility
+│
+├── requirements.txt                 # Python dependencies
+└── README.md                       # This file
 ```
 
-##  Usage Notes
 
-1. **Subject-based splits**: Prevents data leakage between train/validation  
-2. **No preprocessing included**: This model does not perform any preprocessing and/or artifact removal.  
+## 📝 Usage Notes
+
+1. **Modular Architecture**: Choose between fmriNet8/16/32 based on computational resources and complexity needs
+2. **Subject-based splits**: Prevents data leakage between train/validation  
+3. **No preprocessing included**: This model does not perform any preprocessing and/or artifact removal.  
    Commonly available pipelines (e.g., fMRIPrep) can be used for artifact removal, preprocessing, and filtering.  
-3. **Custom constraints**: ZeroThresholdConstraint enforces sparsity  
-4. **Learning rate scheduling**: Halves LR every 200 epochs  
-5. **Model checkpointing**: Automatically saves best performing model  
-6. **Filter interpretation**: Visualize learned temporal and spatial patterns
-
+4. **Custom constraints**: ZeroThresholdConstraint enforces sparsity in spatial filters
+5. **Learning rate scheduling**: Halves LR every 200 epochs  
+6. **Model checkpointing**: Automatically saves best performing model  
+7. **Filter interpretation**: Visualize learned temporal and spatial patterns
 
 ## Acknowledgments
 
