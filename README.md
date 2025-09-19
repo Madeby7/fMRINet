@@ -4,24 +4,29 @@ A deep learning approach for classifying cognitive task states from fMRI time se
 
 ## Overview
 
-This project implements a 6-class classification system for fMRI task states:
+This framework implements a configurable classification system for fMRI task states.  
 
-| Task Code | Task Name | Label |
-|-----------|-----------|-------|
-| **PVT** | Psychomotor Vigilance Task | 0 |
-| **VWM** | Visual Working Memory | 1 |
-| **DOT** | Dot Motion Task | 2 |
-| **MOD** | Modular Task | 3 |
-| **DYN** | Dynamic Task | 4 |
-| **rest** | Resting State | 5 |
+- `num_classes`: number of task categories in your dataset  
+- `input_shape`: shape of your region × time × channel matrix (default `(214, 277, 1)`)
 
-##  Sample Dataset Information
+You can train on **any set of task labels**. For example, our demo dataset includes 6 tasks:
+
+| Task Code | Task Name                  | Label |
+|-----------|----------------------------|-------|
+| PVT       | Psychomotor Vigilance Task | 0 |
+| VWM       | Visual Working Memory      | 1 |
+| DOT       | Dot Motion Task            | 2 |
+| MOD       | Modular Task               | 3 |
+| DYN       | Dynamic Task               | 4 |
+| rest      | Resting State              | 5 |
+
+## Sample Dataset Information
 
 - **Input Dimensions**: `(214, 277, 1)` → (brain regions, time points, channels)
 - **Architecture**: Custom CNN adapted from EEGNet for fMRI data
 - **Performance**: ~84% balanced accuracy on validation set
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Environment Setup
 
@@ -87,13 +92,15 @@ weights = sklearn.utils.class_weight.compute_class_weight(
 # Choose from three available architectures
 from fMRINet import fmriNet8, fmriNet16, fmriNet32
 
-model = fmriNet8(num_classes=6)   # 8 temporal filters
+# Default usage (demo dataset)
+model = fmriNet8(num_classes=6)
 # model = fmriNet16(num_classes=6)  # 16 temporal filters  
 # model = fmriNet32(num_classes=6) # 32 temporal filters
 
+# Custom dataset (e.g., 200 regions × 300 time points × 1 channel, 4 tasks)
+model = fmriNet8(num_classes=4, input_shape=(200, 300, 1))
 model.summary()
 ```
-
 ### Step 5: Training Configuration
 
 ```python
