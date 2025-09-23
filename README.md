@@ -26,16 +26,28 @@ You can train on **any set of task labels**. For example, our demo dataset inclu
 - **Architecture**: Custom CNN adapted from EEGNet for fMRI data
 - **Performance**: ~84% balanced accuracy on validation set
 
+## Usage Notes
+
+1. **Input requirements**: Data must be structured as `(regions × time points × channels)` arrays.  
+   - Default: `(214, 277, 1)`  
+   - Preprocessing (e.g., fMRIPrep) should be applied beforehand for artifact removal.  
+2. **Subject-based splits**: Training and validation are split by subject IDs to prevent data leakage.  
+3. **Modular architecture**: Choose between `fmriNet8`, `fmriNet16`, or `fmriNet32` depending on available compute and task complexity.  
+4. **Custom constraints**: `ZeroThresholdConstraint` enforces sparsity in spatial filters.  
+5. **Training setup**: Learning rate scheduling (halves every 200 epochs) and checkpointing are built-in.  
+6. **Filter interpretation**: Learned temporal and spatial patterns can be visualized for interpretability.  
+
 ## Quick Start
 
 ### 1. Environment Setup
 
 ```bash
-# Create conda environment
-conda create --name tf python=3.8 anaconda 
+# Create and activate a new conda environment
+conda create --name tf python=3.8
 conda activate tf
-conda install tensorflow-gpu
-```
+
+# Install dependencies
+pip install -r requirements.txt
 
 ### 2. Required Files
 
@@ -205,7 +217,7 @@ The notebook includes visualization of learned filters:
 
 
 ## Important Note: 
-The results section and Filter Visualization considered with the actual dataframe.pkl which includes actual data; Considering overall methodology that performed with fMRI filter base CNN arhitecture we mentioned toy_dataframe that include pretty tiny amount of the data to provide to work on. 
+The Results section and Filter Visualization were based on the actual dataframe.pkl, which contains the full dataset. In contrast, for methodological demonstration, we also introduced a toy_dataframe with a much smaller subset of the data to illustrate the workflow in a simplified way. The full analysis, however, was performed using the fMRI filter-based CNN architecture with the complete dataset.
 
 ## 📁 Project Structure
 
@@ -227,18 +239,6 @@ fMRI-PROJECT/
 ├── requirements.txt                 # Python dependencies
 └── README.md                       # This file
 ```
-
-
-## 📝 Usage Notes
-
-1. **Modular Architecture**: Choose between fmriNet8/16/32 based on computational resources and complexity needs
-2. **Subject-based splits**: Prevents data leakage between train/validation  
-3. **No preprocessing included**: This model does not perform any preprocessing and/or artifact removal.  
-   Commonly available pipelines (e.g., fMRIPrep) can be used for artifact removal, preprocessing, and filtering.  
-4. **Custom constraints**: ZeroThresholdConstraint enforces sparsity in spatial filters
-5. **Learning rate scheduling**: Halves LR every 200 epochs  
-6. **Model checkpointing**: Automatically saves best performing model  
-7. **Filter interpretation**: Visualize learned temporal and spatial patterns
 
 ## Acknowledgments
 
