@@ -1,5 +1,20 @@
-pandas>=1.5
-numpy>=1.23
-matplotlib>=3.6
-scikit-learn>=1.2
-tensorflow>=2.10
+# Core scientific computing packages
+numpy>=1.23.0
+pandas>=1.5.0
+matplotlib>=3.6.0
+scikit-learn>=1.2.0
+
+# PyTorch ecosystem
+torch>=1.12.0
+torchvision>=0.13.0
+torchsummary>=1.5.1
+
+# Optional: For CUDA support (if using GPU) & spesfic version of your already installed cuda; you can directly see the compatible torch version from the torch website to download 
+# torch>=1.12.0+cu116
+# torchvision>=0.13.0+cu116
+
+# Data processing and machine learning
+pickle5>=0.0.12 
+
+# Additional utilities
+tqdm>=4.64.0 
