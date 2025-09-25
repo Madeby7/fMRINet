@@ -43,7 +43,7 @@ You can train on **any set of task labels**. For example, our demo dataset inclu
 
 ```bash
 # Create and activate a new conda environment
-conda create --name torch_fmri python=3.8
+conda create --name torch_fmri python=3.10
 conda activate torch_fmri
 
 # Install dependencies
@@ -379,3 +379,4 @@ fMRI-PROJECT/
 This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/vlawhern/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
 
 Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification and implemented in PyTorch with HWC format compatibility.
+
