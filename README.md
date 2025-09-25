@@ -46,8 +46,13 @@ You can train on **any set of task labels**. For example, our demo dataset inclu
 conda create --name tf python=3.8
 conda activate tf
 
+
 # Install dependencies
 pip install -r requirements.txt
+### TensorFlow & AdamW Note
+
+- For TensorFlow **2.11+**, `AdamW` is included in `tensorflow.keras` (no extra steps).  
+- For TensorFlow **2.10.x**, `AdamW` comes from `tensorflow-addons`.  
 
 ### 2. Required Files
 
