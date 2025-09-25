@@ -368,15 +368,6 @@ fMRI-PROJECT/
 └── README.md                       # This file
 ```
 
-## PyTorch Implementation Highlights
-
-### Custom HWC Layers
-This implementation features custom PyTorch layers that work directly with Height-Width-Channel (HWC) format:
-- `HWCConv2d`: Convolution maintaining HWC format
-- `HWCBatchNorm2d`: Batch normalization for HWC tensors
-- `HWCAvgPool2d`: Average pooling preserving HWC layout
-- `HWCTFSamePad2d`: TensorFlow-style SAME padding
-- `HWCSeparableConv2d`: Separable convolution in HWC format
 
 ### Memory and Performance
 - **GPU Optimization**: Automatic CUDA detection and efficient tensor operations
@@ -386,4 +377,5 @@ This implementation features custom PyTorch layers that work directly with Heigh
 ## Acknowledgments
 
 This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/vlawhern/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
+
 Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification and implemented in PyTorch with HWC format compatibility.
