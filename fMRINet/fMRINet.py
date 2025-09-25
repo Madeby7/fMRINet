@@ -9,7 +9,7 @@ import tensorflow as tf
 
 
 class ZeroThresholdConstraint(Constraint):
-    def __init__(self, threshold=1e-4):
+    def __init__(self, threshold=0.01):
         self.threshold = threshold
 
     def __call__(self, w):
@@ -25,7 +25,7 @@ def build_fmri_net(
     num_classes=6,
     input_shape=(214, 277, 1),
     depth_multiplier=4,
-    zero_thresh=1e-4,
+    zero_thresh=1e-2,
     dropout_in=0.25,
     dropout_mid=0.5,
     temporal_kernel_sec=60,
