@@ -57,7 +57,7 @@ Ensure these files are in your project directory:
 - `fMRINet/dataframe.pkl` - Full fMRI dataset (contact author for access)
 - `fMRINet/subjs.pickle` - Pre-defined subject splits
 - `fMRINet/fMRINet_8.ipynb` - Main notebook
-- `fMRINet/fMRINet_torch_3.py` - PyTorch model architecture definitions
+- `fMRINet/fMRINet_torch.py` - PyTorch model architecture definitions
 
 ### 3. Run the Analysis
 
@@ -109,7 +109,7 @@ class_weights = {int(cls): float(w) for cls, w in enumerate(weights)}
 
 ```python
 # Choose from three available architectures
-from fMRINet_torch_3 import fmriNet8, fmriNet16, fmriNet32
+from fMRINet_torch import fmriNet8, fmriNet16, fmriNet32
 
 # Default usage (demo dataset)
 model = fmriNet8(num_classes=6, use_cuda=True)
@@ -358,7 +358,7 @@ fMRI-PROJECT/
 │
 ├── fMRINet/                         # Main project directory
 │   ├── fMRINet_8.ipynb             # Main analysis notebook (PyTorch)
-│   ├── fMRINet_torch_3.py          # PyTorch model architecture definitions
+│   ├── fMRINet_torch.py          # PyTorch model architecture definitions
 │   ├── checkpoint.pth               # Saved model checkpoint
 │   ├── toy_dataframe.pkl           # Demo dataset (for testing)
 │   ├── dataframe.pkl               # Full dataset - [Contact authors for access]
