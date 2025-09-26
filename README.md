@@ -204,6 +204,10 @@ Flatten → Dense(6) → Softmax
 - **Balanced Accuracy**: ~84%
 - **Final Validation Loss**: ~0.55
 
+## Accuracy/Loss Visualization
+
+![Accuracy/Loss](assets/plots/accuracy_loss.png)
+
 ## 🔍 Filter Visualization
 
 The notebook includes visualization of learned filters:
