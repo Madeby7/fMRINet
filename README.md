@@ -43,7 +43,7 @@ You can train on **any set of task labels**. For example, our demo dataset inclu
 
 ```bash
 # Create and activate a new conda environment
-conda create --name torch_fmri python=3.10
+conda create --name torch_fmri python=3.8
 conda activate torch_fmri
 
 # Install dependencies
@@ -107,8 +107,10 @@ class_weights = {int(cls): float(w) for cls, w in enumerate(weights)}
 
 ### Step 4: Model Architecture Selection
 
+#### Option A: Predefined Architectures (Recommended)
+
 ```python
-# Choose from three available architectures
+# Choose from three available predefined architectures
 from fMRINet_torch import fmriNet8, fmriNet16, fmriNet32
 
 # Default usage (demo dataset)
@@ -123,6 +125,37 @@ model = fmriNet8(num_classes=4, input_shape=(200, 300, 1), use_cuda=True)
 from torchsummary import summary
 summary(model, input_size=(277, 214, 1))  # Note: torchsummary uses CHW format
 ```
+
+#### Option B: Custom Architecture (Advanced Users)
+
+```python
+# Build custom fMRINet with fine-grained control over all parameters
+from fMRINet_torch import build_fmri_net
+
+# Example 1: Custom temporal filters with adjusted hyperparameters
+model = build_fmri_net(
+    temporal_filters=12,           # Custom number of temporal filters
+    num_classes=6,                 # Number of task classes
+    input_shape=(214, 277, 1),     # Input dimensions (H, W, C) - [Height, Width, Channels]
+    depth_multiplier=4,            # Spatial filter multiplier
+    zero_thresh=5e-3,              # Custom sparsity threshold
+    dropout_in=0.3,                # Input dropout rate
+    dropout_mid=0.4,               # Mid-layer dropout rate
+    name="custom_fmriNet",         # Model name
+    use_cuda=True,                 # GPU usage
+    debug=False                    # Debug mode
+)
+
+# Display custom model summary
+summary(model, input_size=(277, 214, 1))
+```
+
+**Parameter Guide for Custom Architectures:**
+- `temporal_filters`: Number of temporal filters (4, 8, 16, 32, 64, ...)
+- `depth_multiplier`: Spatial filter multiplier (2, 4, 8, 16)
+- `zero_thresh`: Sparsity constraint threshold (1e-5 to 1e-2)
+- `dropout_in/dropout_mid`: Regularization strength (0.1 to 0.6)
+- `input_shape`: (height, width, channels) - adjust to your data dimensions
 
 ### Step 5: Training Configuration
 
@@ -368,6 +401,15 @@ fMRI-PROJECT/
 └── README.md                       # This file
 ```
 
+## PyTorch Implementation Highlights
+
+### Custom HWC Layers
+This implementation features custom PyTorch layers that work directly with Height-Width-Channel (HWC) format:
+- `HWCConv2d`: Convolution maintaining HWC format
+- `HWCBatchNorm2d`: Batch normalization for HWC tensors
+- `HWCAvgPool2d`: Average pooling preserving HWC layout
+- `HWCTFSamePad2d`: TensorFlow-style SAME padding
+- `HWCSeparableConv2d`: Separable convolution in HWC format
 
 ### Memory and Performance
 - **GPU Optimization**: Automatic CUDA detection and efficient tensor operations
@@ -377,6 +419,4 @@ fMRI-PROJECT/
 ## Acknowledgments
 
 This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/vlawhern/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
-
 Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification and implemented in PyTorch with HWC format compatibility.
-
