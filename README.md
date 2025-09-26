@@ -161,7 +161,7 @@ balanced_accuracy = balanced_accuracy_score(
 )
 ```
 
-## 🏗️ Model Architecture Details
+## Model Architecture Details
 
 ![Summary & Explanations of fMRINet8](assets/images/model_architecture_table.jpg)
 
@@ -208,7 +208,7 @@ Flatten → Dense(6) → Softmax
 
 ![Accuracy/Loss](assets/plots/accuracy_loss.png)
 
-## 🔍 Filter Visualization
+## Filter Visualization
 
 The notebook includes visualization of learned filters:
 
@@ -228,7 +228,7 @@ The notebook includes visualization of learned filters:
 ## Important Note: 
 The Results section and Filter Visualization were based on the actual dataframe.pkl, which contains the full dataset. In contrast, for methodological demonstration, we also introduced a toy_dataframe with a much smaller subset of the data to illustrate the workflow in a simplified way. The full analysis, however, was performed using the fMRI filter-based CNN architecture with the complete dataset.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 fMRI-PROJECT/
@@ -252,4 +252,5 @@ fMRI-PROJECT/
 ## Acknowledgments
 
 This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/vlawhern/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
+
 Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification.
