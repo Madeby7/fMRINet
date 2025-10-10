@@ -1,13 +1,13 @@
 # fMRI Task State Classification with Deep Learning
 
-A deep learning approach for classifying cognitive task states from fMRI time series data using a custom CNN architecture adapted from EEGNet for neuroimaging data, implemented in PyTorch.
+A deep learning approach for classifying cognitive task states from fMRI time series data using a custom CNN architecture adapted from EEGNet for neuroimaging data, implemented in PyTorch with standard CHW format.
 
 ## Overview
 
 This framework implements a configurable classification system for fMRI task states.  
 
 - `num_classes`: number of task categories in your dataset  
-- `input_shape`: shape of your region × time × channel matrix (default `(214, 277, 1)`)
+- `input_shape`: shape of your channel × region × time matrix (default `(1, 214, 277)`)
 
 You can train on **any set of task labels**. For example, our demo dataset includes 6 tasks:
 
@@ -22,14 +22,14 @@ You can train on **any set of task labels**. For example, our demo dataset inclu
 
 ## Sample Dataset Information
 
-- **Input Dimensions**: `(214, 277, 1)` → (brain regions, time points, channels)
+- **Input Dimensions**: `(1, 214, 277)` → (channels, brain regions, time points) in CHW format
 - **Architecture**: Custom CNN adapted from EEGNet for fMRI data
 - **Performance**: ~84% balanced accuracy on validation set
 
 ## Usage Notes
 
-1. **Input requirements**: Data must be structured as `(regions × time points × channels)` arrays in HWC format.  
-   - Default: `(214, 277, 1)`  
+1. **Input requirements**: Data must be structured and converted to PyTorch CHW format `(C, H, W)`.  
+   - Default: `(1, 214, 277)` - 1 channel, 214 regions, 277 time points
    - Preprocessing (e.g., fMRIPrep) should be applied beforehand for artifact removal.  
 2. **Subject-based splits**: Training and validation are split by subject IDs to prevent data leakage.  
 3. **Modular architecture**: Choose between `fmriNet8`, `fmriNet16`, or `fmriNet32` depending on available compute and task complexity.  
@@ -81,11 +81,14 @@ valid_df = df[df['subject'].isin(subjs[45:,])]
 ### Step 2: Data Transformation
 
 ```python
-# Transform data to proper tensor format (HWC format for PyTorch)
+# Transform data to proper tensor format for PyTorch CHW format
 train_data = np.dstack(train_df['Time_Series_Data'])
 train_data = np.expand_dims(train_data, axis=0)
-train_data = np.transpose(train_data, axes=[3, 2, 1, 0])
-# Final shape: (batch, regions, time_points, channels) - HWC format
+train_data = np.transpose(train_data, axes=[3, 2, 1, 0])  # (batch, region, time, channel)
+
+# Convert to PyTorch CHW format: (B, C, H, W)
+train_data_tensor = torch.FloatTensor(train_data).permute(0, 3, 1, 2)
+# Final shape: (batch, channels, regions, time_points) - CHW format
 ```
 
 ### Step 3: Class Balancing
@@ -95,7 +98,7 @@ train_data = np.transpose(train_data, axes=[3, 2, 1, 0])
 from sklearn.utils.class_weight import compute_class_weight
 import torch
 
-# Convert labels and compute weights
+# Convert one-hot labels to class indices for PyTorch
 train_label_indices = np.argmax(train_label_t, axis=1)
 weights = compute_class_weight(
     class_weight='balanced',
@@ -113,17 +116,17 @@ class_weights = {int(cls): float(w) for cls, w in enumerate(weights)}
 # Choose from three available predefined architectures
 from fMRINet_torch import fmriNet8, fmriNet16, fmriNet32
 
-# Default usage (demo dataset)
-model = fmriNet8(num_classes=6, use_cuda=True)
+# Default usage (demo dataset) - CHW format
+model = fmriNet8(num_classes=6, input_shape=(1, 214, 277), use_cuda=True)
 # model = fmriNet16(num_classes=6, use_cuda=True)  # 16 temporal filters  
 # model = fmriNet32(num_classes=6, use_cuda=True)  # 32 temporal filters
 
-# Custom dataset (e.g., 200 regions × 300 time points × 1 channel, 4 tasks)
-model = fmriNet8(num_classes=4, input_shape=(200, 300, 1), use_cuda=True)
+# Custom dataset (e.g., 1 channel × 200 regions × 300 time points, 4 tasks)
+model = fmriNet8(num_classes=4, input_shape=(1, 200, 300), use_cuda=True)
 
 # Display model summary
 from torchsummary import summary
-summary(model, input_size=(277, 214, 1))  # Note: torchsummary uses CHW format
+summary(model, input_size=(1, 214, 277))  # Standard PyTorch CHW format
 ```
 
 #### Option B: Custom Architecture (Advanced Users)
@@ -136,7 +139,7 @@ from fMRINet_torch import build_fmri_net
 model = build_fmri_net(
     temporal_filters=12,           # Custom number of temporal filters
     num_classes=6,                 # Number of task classes
-    input_shape=(214, 277, 1),     # Input dimensions (H, W, C) - [Height, Width, Channels]
+    input_shape=(1, 214, 277),     # Input dimensions (C, H, W) - [Channels, Height, Width]
     depth_multiplier=4,            # Spatial filter multiplier
     zero_thresh=5e-3,              # Custom sparsity threshold
     dropout_in=0.3,                # Input dropout rate
@@ -147,7 +150,7 @@ model = build_fmri_net(
 )
 
 # Display custom model summary
-summary(model, input_size=(277, 214, 1))
+summary(model, input_size=(1, 214, 277))
 ```
 
 **Parameter Guide for Custom Architectures:**
@@ -155,7 +158,7 @@ summary(model, input_size=(277, 214, 1))
 - `depth_multiplier`: Spatial filter multiplier (2, 4, 8, 16)
 - `zero_thresh`: Sparsity constraint threshold (1e-5 to 1e-2)
 - `dropout_in/dropout_mid`: Regularization strength (0.1 to 0.6)
-- `input_shape`: (height, width, channels) - adjust to your data dimensions
+- `input_shape`: (channels, height, width) - adjust to your data dimensions
 
 ### Step 5: Training Configuration
 
@@ -208,10 +211,10 @@ checkpointer = ModelCheckpoint()
 # Training loop
 from torch.utils.data import DataLoader, TensorDataset
 
-# Convert data to PyTorch tensors (HWC format)
-train_data_tensor = torch.FloatTensor(train_data).to(device)
+# Convert data to PyTorch tensors in CHW format
+train_data_tensor = torch.FloatTensor(train_data).permute(0, 3, 1, 2).to(device)
 train_label_tensor = torch.LongTensor(train_label_indices).to(device)
-valid_data_tensor = torch.FloatTensor(valid_data).to(device)
+valid_data_tensor = torch.FloatTensor(valid_data).permute(0, 3, 1, 2).to(device)
 valid_label_tensor = torch.LongTensor(valid_label_indices).to(device)
 
 # Create data loaders
@@ -230,7 +233,7 @@ for epoch in range(epochs):
     
     for data, target in train_loader:
         optimizer.zero_grad()
-        output = model(data)  # HWC format input
+        output = model(data)  # CHW format input
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
@@ -289,42 +292,42 @@ print(f"Balanced Accuracy: {balanced_accuracy:.4f}")
 
 ![Summary & Explanations of fMRINet8](assets/images/model_architecture_table.jpg)
 
-### Network Structure (PyTorch Implementation)
+### Network Structure (PyTorch CHW Implementation)
 ```
-Input: (214, 277, 1) - HWC Format
+Input: (1, 214, 277) - CHW Format
     ↓
 Dropout(0.25)
     ↓
-HWCConv2D(8, (1,60)) - Temporal Filtering (SAME padding)
+Conv2D(8, (1,60)) - Temporal Filtering (SAME padding)
     ↓
-Permute → HWCConstrainedConv2D - Spatial Processing (VALID padding)
+ConstrainedConv2D - Spatial Processing (214,1) kernel
     ↓
-HWCBatchNorm → ReLU → HWCAvgPool2D
+BatchNorm2d → ReLU → AvgPool2d
     ↓
-HWCSeparableConv2D(64) - Feature Extraction (SAME padding)
+SeparableConv2D(64) - Feature Extraction (1,8) kernel
     ↓
-HWCBatchNorm → ReLU → HWCAvgPool2D
+BatchNorm2d → ReLU → AvgPool2d
     ↓
 Flatten → Linear(6) → Logits
 ```
 
 ### Key Components
 
-1. **ZeroThresholdConstraint**: Custom constraint for sparsity (threshold=7e-3 for PyTorch)
-2. **HWC Format**: Custom layers that work directly with Height-Width-Channel format
-3. **TensorFlow-like Behavior**: Exact replication of TensorFlow's padding and operations
+1. **ZeroThresholdConstraint**: Custom constraint for sparsity (threshold=1e-2 for PyTorch)
+2. **CHW Format**: Standard PyTorch format (Channels, Height, Width)
+3. **ConstrainedConv2d**: Custom convolution layer with weight constraints
 4. **Balanced Class Weights**: Handles dataset imbalance using weighted CrossEntropyLoss
 
 ### PyTorch-Specific Features
-- **HWC Format Support**: Custom layers maintain TensorFlow-like data format
+- **Standard CHW Format**: Uses PyTorch's native channel-first format
 - **GPU Acceleration**: Automatic CUDA detection and device placement
 - **Memory Efficient**: Optimized tensor operations for large fMRI datasets
 - **Checkpoint System**: Save/load model states with optimizer information
 
 ### Model Parameters
-- **Total Parameters**: ~11,558 (varies slightly due to PyTorch implementation)
+- **Total Parameters**: ~11,366
 - **Trainable Parameters**: ~11,366
-- **Input Format**: (B, H, W, C) where B=batch, H=214, W=277, C=1
+- **Input Format**: (B, C, H, W) where B=batch, C=1, H=214, W=277
 
 ## Results
 
@@ -341,7 +344,7 @@ The notebook includes PyTorch-specific visualization of learned filters:
 # Extract temporal filters (8 filters of length 60)
 model.eval()
 with torch.no_grad():
-    w = model.conv1.conv.weight.detach().cpu().numpy()  # (8, 1, 1, 60)
+    w = model.conv1.weight.detach().cpu().numpy()  # (8, 1, 1, 60)
     w = w[:, 0, 0, :]  # (8, 60)
 
 fig, axes = plt.subplots(2, 4, figsize=(12, 4))
@@ -356,12 +359,13 @@ for i in range(8):
 # Extract spatial filters (32 filters organized as 8×4)
 model.eval()
 with torch.no_grad():
-    W = model.depthwise_conv.conv.weight.detach().cpu().numpy()  # (32, 1, 1, 214)
-    W = W[:, 0, 0, :].reshape(8, 4, 214).transpose(2, 0, 1)     # (214, 8, 4)
+    W = model.depthwise_conv.weight.detach().cpu().numpy()  # (32, 1, 214, 1)
+    W = W[:, 0, :, 0]                                        # (32, 214)
+    W = W.reshape(8, 4, 214).transpose(2, 0, 1)              # (214, 8, 4)
 
 fig, axes = plt.subplots(8, 4, figsize=(8, 12))
 for j in range(8):  # temporal filter index
-    for k in range(4):  # spatial filter index
+    for k in range(4):  # spatial filter index (depth multiplier)
         ax = axes[j, k]
         ax.plot(W[:201, j, k])  # Plot first 201 spatial positions
         ax.set_title(f"T. Filter {j+1}, S. Filter {k+1}", fontsize=8)
@@ -375,13 +379,18 @@ for j in range(8):  # temporal filter index
 
 ![Spatial filters](assets/plots/spatial_filters.png)
 
-## Important Note: 
+## Important Notes
+
+### Data Format Requirements
+- **Input**: Data is preprocessed in HWC format then converted to PyTorch CHW format using `.permute(0, 3, 1, 2)`
+- **Model**: Expects CHW format: `(batch, channels, height, width)`
+- **Validation**: Shape assertions ensure compatibility: `(B, 1, 214, 277)`
+
 The **Results** section and **Filter Visualization** were generated using the full dataset contained in `dataframe.pkl`.  
 For methodological demonstration purposes, we also introduced a smaller `toy_dataframe`, which includes only a limited subset of the data to illustrate the workflow in a simplified manner.  
 
 Please note that the toy dataset was **not** used to produce any of the plots or reported results.  
 All final analyses and visualizations were performed exclusively on the complete dataset using the fMRI filter-based CNN architecture.
-
 
 ## 📁 Project Structure
 
@@ -396,8 +405,9 @@ fMRI-PROJECT/
 │
 ├── fMRINet/                         # Main project directory
 │   ├── fMRINet_8.ipynb             # Main analysis notebook (PyTorch)
-│   ├── fMRINet_torch.py          # PyTorch model architecture definitions
+│   ├── fMRINet_torch.py            # PyTorch model architecture definitions
 │   ├── toy_dataframe.pkl           # Demo dataset (for testing)
+│   ├── dataframe.pkl               # Full dataset - [Contact authors for access]
 │   └── subjs.pickle                # Subject ID splits for reproducibility
 │
 ├── requirements.txt                 # Python dependencies (PyTorch-based)
@@ -406,22 +416,22 @@ fMRI-PROJECT/
 
 ## PyTorch Implementation Highlights
 
-### Custom HWC Layers
-This implementation features custom PyTorch layers that work directly with Height-Width-Channel (HWC) format:
-- `HWCConv2d`: Convolution maintaining HWC format
-- `HWCBatchNorm2d`: Batch normalization for HWC tensors
-- `HWCAvgPool2d`: Average pooling preserving HWC layout
-- `HWCTFSamePad2d`: TensorFlow-style SAME padding
-- `HWCSeparableConv2d`: Separable convolution in HWC format
+### Standard PyTorch Architecture
+This implementation uses standard PyTorch components with CHW format:
+- `nn.Conv2d`: Standard 2D convolutions with constraint support
+- `nn.BatchNorm2d`: Batch normalization for feature maps
+- `nn.AvgPool2d`: Average pooling operations
+- `ConstrainedConv2d`: Custom convolution with weight constraints
+- `ZeroThresholdConstraint`: Sparsity enforcement for spatial filters
 
 ### Memory and Performance
 - **GPU Optimization**: Automatic CUDA detection and efficient tensor operations
 - **Batch Processing**: Optimized for mini-batch training with configurable batch sizes
-- **Memory Efficient**: Custom layers minimize unnecessary tensor permutations
+- **Memory Efficient**: Uses PyTorch's native CHW format for optimal performance
+- **Cross-platform**: Compatible with TensorFlow preprocessing pipelines
 
 ## Acknowledgments
 
 This project adapts and extends the [EEGNet/EEGModels framework](https://github.com/vlawhern/arl-eegmodels) originally developed by Vernon J. Lawhern and colleagues at the Army Research Laboratory.  
 
-Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification and implemented in PyTorch with HWC format compatibility.
-
+Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification and implemented in PyTorch with standard CHW format.
