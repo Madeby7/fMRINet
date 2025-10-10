@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 
 class ZeroThresholdConstraint:
-    def __init__(self, threshold=1e-2):
+    def __init__(self, threshold=0.025):
         self.threshold = threshold
     
     def __call__(self, w):
@@ -29,7 +29,7 @@ class ConstrainedConv2d(nn.Conv2d):
 class FMRINet(nn.Module):
     """Simplified FMRINet using standard PyTorch CHW format"""
     def __init__(self, temporal_filters=8, num_classes=6, input_shape=(1, 214, 277),
-                 depth_multiplier=4, zero_thresh=1e-2, dropout_in=0.25,
+                 depth_multiplier=4, zero_thresh=0.025, dropout_in=0.25,
                  dropout_mid=0.5, name="fmriNet", debug=False):
         super().__init__()
         self.name = name
@@ -167,7 +167,7 @@ class FMRINet(nn.Module):
 
 # Helper functions
 def build_fmri_net(temporal_filters=8, num_classes=6, input_shape=(1, 214, 277),
-                   depth_multiplier=4, zero_thresh=1e-2, dropout_in=0.25,
+                   depth_multiplier=4, zero_thresh=0.025, dropout_in=0.25,
                    dropout_mid=0.5, name="fmriNet", use_cuda=True, debug=False):
     """Build fMRINet model"""
     model = FMRINet(
