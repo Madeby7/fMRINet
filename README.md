@@ -260,3 +260,4 @@ This project adapts and extends the [EEGNet/EEGModels framework](https://github.
 Their work on CNN architectures for EEG classification provided the foundation for the temporal–spatial convolutional design used here, which we have customized for fMRI task-state classification.
 
 
+
